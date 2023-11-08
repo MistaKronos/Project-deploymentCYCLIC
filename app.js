@@ -30,13 +30,13 @@ var app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+app.use(auth(config));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "pictures")));
-app.use(auth(config));
 
 // Middleware to make the `user` object available for all views
 app.use(function (req, res, next) {
