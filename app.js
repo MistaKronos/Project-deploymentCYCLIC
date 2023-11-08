@@ -4,6 +4,22 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 require("dotenv").config();
+const { auth } = require("express-openid-connect");
+
+const config = {
+  authRequired: false,
+  auth0Logout: true,
+};
+
+const port = process.env.PORT || 3000;
+if (
+  !config.baseURL &&
+  !process.env.BASE_URL &&
+  process.env.PORT &&
+  process.env.NODE_ENV !== "production"
+) {
+  config.baseURL = `http://localhost:${port}`;
+}
 
 var indexRouter = require("./routes/index");
 var picturesRouter = require("./routes/pictures");
@@ -36,6 +52,14 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
+
+  app.use(auth(config));
+
+  // Middleware to make the `user` object available for all views
+  app.use(function (req, res, next) {
+    res.locals.user = req.oidc.user;
+    next();
+  });
 
   // render the error page
   res.status(err.status || 500);
