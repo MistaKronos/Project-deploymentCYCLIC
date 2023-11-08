@@ -36,7 +36,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "pictures")));
+app.use(auth(config));
 
+// Middleware to make the `user` object available for all views
+app.use(function (req, res, next) {
+  res.locals.user = req.oidc.user;
+  next();
+});
 const fileUpload = require("express-fileupload");
 app.use(fileUpload());
 app.use("/", indexRouter);
@@ -52,14 +58,6 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  app.use(auth(config));
-
-  // Middleware to make the `user` object available for all views
-  app.use(function (req, res, next) {
-    res.locals.user = req.oidc.user;
-    next();
-  });
 
   // render the error page
   res.status(err.status || 500);
