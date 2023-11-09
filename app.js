@@ -6,6 +6,22 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const { auth } = require("express-openid-connect");
 
+var indexRouter = require("./routes/index");
+var picturesRouter = require("./routes/pictures");
+
+var app = express();
+
+// view engine setup
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
+app.use(logger("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "pictures")));
+
 const config = {
   authRequired: false,
   auth0Logout: true,
@@ -21,30 +37,17 @@ if (
   config.baseURL = `http://localhost:${port}`;
 }
 
-var indexRouter = require("./routes/index");
-var picturesRouter = require("./routes/pictures");
-
-var app = express();
-
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
-
 app.use(auth(config));
-app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "pictures")));
 
 // Middleware to make the `user` object available for all views
 app.use(function (req, res, next) {
   res.locals.user = req.oidc.user;
   next();
 });
+
 const fileUpload = require("express-fileupload");
 app.use(fileUpload());
+
 app.use("/", indexRouter);
 app.use("/pictures", picturesRouter);
 
