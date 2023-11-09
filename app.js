@@ -33,7 +33,7 @@ if (
   !config.baseURL &&
   !process.env.BASE_URL &&
   process.env.PORT &&
-  process.env.NODE_ENV !== "prod"
+  process.env.NODE_ENV !== "production"
 ) {
   config.baseURL = `http://localhost:${port}`;
 }
