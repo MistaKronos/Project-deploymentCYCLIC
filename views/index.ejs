@@ -11,7 +11,7 @@
     />
   </head>
   <body>
-    <% if (locals.isAuthenticated) { %>
+    <%- include('./partials/navbar.ejs') %> <% if (locals.isAuthenticated) { %>
     <p>You are logged in.</p>
     <% } else { %>
     <p>You are not logged in. <a href="/login" class="underline">Login</a>.</p>
